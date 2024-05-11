@@ -1,6 +1,6 @@
 ![Banner](./banner.png)
 
-# Yakisoba vault contracts
+# Yakisoba async ERC4626 vault contracts
 
 Yakisoba vaults are an alernative breed of ERC4626 vaults, which allows instant redemptions of illiquid assets. The smart contracts were developped during my time at Astrolab.fi, which focused on cross-chain yield aggregation. Since the project decided to move on to a different architecture, I'm open-sourcing them here. 
 
