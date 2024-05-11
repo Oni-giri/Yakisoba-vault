@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/**
-    Note for the non-lawyers: The licence says that, if you fork:
-    - The source code is made available to the public in source code form under the same license
-    - The original author (@yakito_ri) must be attributed
-**/
+
 
 pragma solidity ^0.8.17;
 
