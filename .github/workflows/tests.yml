@@ -1,0 +1,76 @@
+name: tests
+
+on: push
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: npm
+          cache-dependency-path: "**/package-lock.json"
+      - run: npm ci
+
+      - name: Create env file
+        run: |
+          touch .env
+          echo RPC_MAINNET=${{ secrets.RPC_MAINNET }} >> .env
+          echo RPC_MUMBAI=${{ secrets.RPC_MUMBAI }} >> .env
+          echo RPC_FUJI=${{ secrets.RPC_FUJI }} >> .env
+          echo RPC_BSC=${{ secrets.RPC_BSC }} >> .env
+          echo RPC_BSC_TESTNET=${{ secrets.RPC_BSC_TESTNET }} >> .env
+          echo RPC_AVALANCHE=${{ secrets.RPC_AVALANCHE }} >> .env
+          echo REPORT_GAS="true" >> .env
+          echo DEPLOYER_PK=${{ secrets.DEPLOYER_PK }} >> .env
+          echo CMC_APY_KEY=${{ secrets.CMC_API_KEY }} >> .env
+          cat .env
+
+      - name: Compile contracts
+        id: compile
+        run: npx hardhat compile
+
+      - name: Trunk Check
+        id: trunk
+        uses: trunk-io/trunk-action@v1.0.7
+
+      - name: Solhint Check
+        id: solhint
+        run: |
+          npm install -g solhint
+          solhint 'contracts/**/*.sol'
+
+      - name: Test contracts (allocator)
+        id: test-allocator
+        run: npx hardhat test --grep "test.allocator"
+
+      - name: Test contracts (yakisoba)
+        id: test-yakisoba
+        run: npx hardhat test --grep "test.yakisoba"
+
+      - name: Test contracts (allocator)
+        id: test-home-connector
+        run: npx hardhat test --grep "test.homeConnector"
+
+      - name: Test contracts (allocator)
+        id: test-remote-connector
+        run: npx hardhat test --grep "test.remoteConnector"
+
+      - name: Test contracts (allocator)
+        id: test-swap
+        run: npx hardhat test --grep "test.swap.main"
+
+      - name: Contract sizer
+        id: sizer
+        run: npx hardhat size-contracts
+
+      - name: Coverage report
+        id: coverage
+        run: npx hardhat coverage
+
+      - name: Upload coverage results to Codecov.io
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
