@@ -1,17 +1,6 @@
+![Banner](./banner.png)
+
 # Yakisoba vault contracts
-
-Here is the repo for Yakisoba vault contracts.
-
-## Set up
-
-- Download dependencies using `npm install`.
-- Run tests using `npx hardhat test` or `hh test`
-
-## Context
-
-You can see the general flow here: https://miro.com/app/board/uXjVOkj2BwU=/?share_link_id=48973682126
-
-### Intro
 
 Yakisoba vaults are an alernative breed of ERC4626 vaults, which allows instant redemptions of illiquid assets. The smart contracts were developped during my time at Astrolab.fi, which focused on cross-chain yield aggregation. Since the project decided to move on to a different architecture, I'm open-sourcing them here. 
 
@@ -21,7 +10,14 @@ Note for the non-lawyere. The licence (GPL-3.0-or-later) says that, if you fork:
 
 The contracts in their current form have been audited by Hexens. You can find the audit [here](https://hexens.io/audits#astrolab).
 
-Note: The vaults were initially called "Yakisobas", I changed the name to avoid any confusion with Astrolab's current products.
+Note: The vaults were initially called "Crates", I changed the name to avoid any confusion with Astrolab's current products.
+
+You can see the general flow [here](https://miro.com/app/board/uXjVOkj2BwU=/?share_link_id=48973682126).
+
+## Set up
+
+- Download dependencies using `npm install`.
+- Run tests using `npx hardhat test` or `hh test`
 
 ### Liquidity
 
