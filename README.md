@@ -4,15 +4,9 @@
 
 Yakisoba vaults are an alernative breed of ERC4626 vaults, which allows instant redemptions of illiquid assets. The smart contracts were developped during my time at Astrolab.fi, which focused on cross-chain yield aggregation. Since the project decided to move on to a different architecture, I'm open-sourcing them here. 
 
-Note for the non-lawyere. The licence (GPL-3.0-or-later) says that, if you fork:
-- The source code is made available to the public in source code form under the same license
-- The original author (@yakito_ri) must be attributed
-
 The contracts in their current form have been audited by Hexens. You can find the audit [here](https://hexens.io/audits#astrolab).
 
 Note: The vaults were initially called "Crates", I changed the name to avoid any confusion with Astrolab's current products.
-
-You can see the general flow [here](https://miro.com/app/board/uXjVOkj2BwU=/?share_link_id=48973682126).
 
 ## Set up
 
@@ -89,3 +83,7 @@ C) Submit transactions through a private relayer such as Flashbots or SecureRPC
 To solve this, we linearize the profit recorded over a predetermined period (ex: one week):
 
 ![./linearization.png](linearization.png)
+
+### Flow
+
+![Flow](./flow.png)
