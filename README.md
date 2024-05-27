@@ -13,7 +13,33 @@ Note: The vaults were initially called "Crates", I changed the name to avoid any
 - Download dependencies using `npm install`.
 - Run tests using `npx hardhat test` or `hh test`
 
-### Liquidity
+A mock env file is provided to help with the setup. Since coverage is 100%, the load is quite heavy, so I advise to use dedicated RPCs.
+
+## Deploying
+
+You can deploy the contract on a local setup. Because we are doing cross-chain magic 🦄🪄 there are additionnal steps needed:
+- Run `npm run fork:home:staging`. This will boot a local ganache node representing the home chain.
+- Run `npm run fork:remote:staging`. This will boot a local ganache node representing the remote chain.
+
+You can check the `package.json` to change the chains.
+
+Then, run `npm:run:staging:local` to launch the deployment script. It is divided in three waves, as a workaround for the cross-chain deployment, and to ease redeployment if a wave failed.
+
+- When you are done testing on localhost, you can remove the `:local` flag to deploy on testnet. 
+- When you are ready, replace `staging` by `prod` to deploy the contracts on a mainnet!
+
+## Innovative features
+
+What makes the Yakisoba vault different?
+
+- Instant redemptions
+- MEV protection for the vault operator
+- Cross-chain farming
+- Capital allocation flexibility
+
+Read on!
+
+### Instant redemption
 
 Cross-chain liquidity brings a lot of complexity regarding the UX and the stability of the interactions. In a naive implementation, you may have tokens in a pool on chain B, your vault with which users interacts is on chain A. A user can withdraw by calling the yakisoba vault, which will send a cross-chain message to chain B, to pull funds and forward them to the user. Several problems arise:
 
@@ -38,6 +64,28 @@ This allows the protocol to process redemptions without having to pull liquidity
 
 This is a similar logic to what the LSD does - here the innovation comes from the fact that we don't need to bribe/pay for liquidity. The assets in the pool can be staked on Aave, and forks - we plan to use Sturdy, which provides better yield.
 
+### MEV and arbitrage
+
+Even though every cross-chain protocol likes to call itself "omni", information is not instantly shared between chains. As such, arbitrage opportunities arise: let's say the yield generated on a remote chain an increase of 50% of the total assets in the vault. The update of the remote vault would create an easy arbitrage opportunity:
+
+- See the message being sent,
+- Deposit,
+- Wait for the update to be processed
+- Cash out a profit of 50% with minimal risk.
+
+This arbitrage can also be done with classic ERC4626 vaults. The classic mitigations implies:
+A) Compound fast enough
+B) Add withdraw fees (like Beefy does)
+C) Submit transactions through a private relayer such as Flashbots or SecureRPC
+
+`A)` is doable but expensive, `B)` is bad UX-wise, `C)` is not possible.
+
+#### **Linearization of profit**
+
+To solve this, we linearize the profit recorded over a predetermined period (ex: one week):
+
+![./linearization.png](linearization.png)
+
 ### Bridging
 
 Because we want the protocol to be modular and not tie ourselves to a bridge, bridging is done using adapter contracts - `BridgeConnectorHome` and `BridgeConnectorRemote`. It should manage the messaging and the bridging.
@@ -61,28 +109,6 @@ Allocation by chain is done at the vault level. Allocation by strategy is done a
 ### Strategies
 
 `Strategy` is the last link before we stake into a yield opportunity. It manages the interface with the farmed protocol - deposit, compound, withdraw. It should be able to adapt to protocols that require to lock and be easy to write to allow broad participation.
-
-### MEV and arbitrage
-
-Even though every cross-chain protocol likes to call itself "omni", information is not instantly shared between chains. As such, arbitrage opportunities arise: let's say the yield generated on a remote chain an increase of 50% of the total assets in the vault. The update of the remote vault would create an easy arbitrage opportunity:
-
-- See the message being sent,
-- Deposit,
-- Wait for the update to be processed
-- Cash out a profit of 50% with minimal risk.
-
-This arbitrage can also be done with classic ERC4626 vaults. The classic mitigations implies:
-A) Compound fast enough
-B) Add withdraw fees (like Beefy does)
-C) Submit transactions through a private relayer such as Flashbots or SecureRPC
-
-`A)` is doable but expensive, `B)` is bad UX-wise, `C)` is not possible.
-
-#### **Linearization of profit**
-
-To solve this, we linearize the profit recorded over a predetermined period (ex: one week):
-
-![./linearization.png](linearization.png)
 
 ### Flow
 
